@@ -1217,6 +1217,347 @@ function selectCombination(setId, barbellId, comboIndex) {
     });
 }
 
+// 生成列印版本的單個動作訓練內容（只顯示選擇的槓鈴和組合）
+function generatePrintExerciseContent(exerciseKey, trainingMax, weekProgram, week, day) {
+    const dayId = `${week}-${day}`;
+
+    // 獲取選擇的槓鈴
+    const selectedBarbellId = selectedBarbellStore[dayId];
+    if (!selectedBarbellId) {
+        return '<div class="set-info">尚未選擇槓鈴</div>';
+    }
+
+    const selectedBarbell = equipment.barbells.find(b => b.id === selectedBarbellId);
+    if (!selectedBarbell) {
+        return '<div class="set-info">找不到選擇的槓鈴</div>';
+    }
+
+    // 獲取組合數據
+    let combinationsByBarbell = combinationDataStore[dayId];
+    if (!combinationsByBarbell) {
+        try {
+            const cacheKey = `combinations_${dayId}`;
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                combinationsByBarbell = JSON.parse(cached);
+            }
+        } catch (e) {
+            combinationsByBarbell = {};
+        }
+    }
+
+    let content = '';
+
+    // 生成每一組的內容
+    weekProgram.forEach((set, setIndex) => {
+        const weight = calculateTrainingWeight(set.percentage, trainingMax);
+        const reps = set.reps;
+        const sets = set.sets || 1;
+        const setId = `week-${week}-day-${day}-set-${setIndex}`;
+
+        content += '<div class="set-info">';
+
+        // 只在第一組顯示槓鈴名稱
+        if (setIndex === 0) {
+            content += `<span class="barbell-label">${selectedBarbell.name}</span>`;
+        }
+
+        content += `<div class="set-header">`;
+        content += `<strong>組 ${setIndex + 1}:</strong> ${weight} kg × ${reps}${sets > 1 ? ` (${sets}組)` : ''}`;
+        content += `</div>`;
+
+        // 從 DOM 獲取選中的組合索引
+        const comboSelector = document.getElementById(setId);
+        let selectedComboIndex = 0; // 預設選擇第一個
+        let selectedCombo = null;
+
+        if (comboSelector) {
+            const options = comboSelector.querySelectorAll('.combo-option');
+            options.forEach((opt, index) => {
+                if (opt.classList.contains('selected')) {
+                    selectedComboIndex = index;
+                }
+            });
+        }
+
+        // 從組合數據中獲取選中的組合
+        if (combinationsByBarbell && combinationsByBarbell[selectedBarbellId]) {
+            const setData = combinationsByBarbell[selectedBarbellId][setIndex];
+            if (setData && !setData.excluded && setData.combinations && setData.combinations.length > 0) {
+                // 確保索引在有效範圍內
+                if (selectedComboIndex >= 0 && selectedComboIndex < setData.combinations.length) {
+                    selectedCombo = setData.combinations[selectedComboIndex];
+                } else {
+                    // 如果索引無效，使用第一個
+                    selectedCombo = setData.combinations[0];
+                }
+            }
+        }
+
+        // 顯示選中的組合或錯誤訊息
+        if (selectedCombo) {
+            const plateText = formatPlateCombination(selectedCombo.plates);
+            let diffText = '';
+            if (selectedCombo.difference > 0.1) {
+                const sign = selectedCombo.isOver ? '+' : '-';
+                diffText = ` (${sign}${selectedCombo.difference}kg)`;
+            }
+
+            content += `<div class="combo-option">`;
+            content += `<span class="combo-plates">每邊: ${plateText}</span>`;
+            content += `<span class="combo-total">${selectedCombo.totalWeight}kg${diffText}</span>`;
+            content += `</div>`;
+        } else {
+            // 檢查是否被排除
+            if (combinationsByBarbell && combinationsByBarbell[selectedBarbellId]) {
+                const setData = combinationsByBarbell[selectedBarbellId][setIndex];
+                if (setData && setData.excluded) {
+                    const maxWeight = selectedBarbell.maxWeight || 400;
+                    if (setData.exclusionReason === 'exceeds_max') {
+                        content += `<div class="no-combination">目標重量 ${weight} kg 超過此槓鈴承重上限 ${maxWeight} kg</div>`;
+                    } else if (setData.exclusionReason === 'below_barbell_weight') {
+                        content += `<div class="no-combination">目標重量 ${weight} kg 小於槓鈴重量 ${selectedBarbell.weight} kg</div>`;
+                    } else {
+                        content += `<div class="no-combination">此槓鈴無法達成此重量</div>`;
+                    }
+                } else {
+                    content += `<div class="no-combination">無法達成此重量</div>`;
+                }
+            } else {
+                content += `<div class="no-combination">無法達成此重量</div>`;
+            }
+        }
+
+        content += `</div>`;
+    });
+
+    return content;
+}
+
+// 生成列印版本的表格
+function generatePrintTable(trainingMaxes) {
+    let html = '<table class="program-table"><thead><tr>';
+    html += '<th>週次</th>';
+    html += '<th>Day 1<br>深蹲</th>';
+    html += '<th>Day 2<br>肩推</th>';
+    html += '<th>Day 3<br>硬舉</th>';
+    html += '<th>Day 4<br>臥推</th>';
+    html += '</tr></thead><tbody>';
+
+    for (let week = 1; week <= 4; week++) {
+        const weekProgram = WEEK_PROGRAMS[week];
+
+        html += '<tr>';
+        html += `<td class="week-header">${week}</td>`;
+        html += `<td>${generatePrintExerciseContent('squat', trainingMaxes.squat, weekProgram, week, 1)}</td>`;
+        html += `<td>${generatePrintExerciseContent('ohp', trainingMaxes.ohp, weekProgram, week, 2)}</td>`;
+        html += `<td>${generatePrintExerciseContent('deadlift', trainingMaxes.deadlift, weekProgram, week, 3)}</td>`;
+        html += `<td>${generatePrintExerciseContent('bench', trainingMaxes.bench, weekProgram, week, 4)}</td>`;
+        html += '</tr>';
+    }
+
+    html += '</tbody></table>';
+    return html;
+}
+
+// 列印課表
+function printSchedule() {
+    const programSection = document.getElementById('program-section');
+    if (!programSection || programSection.style.display === 'none') {
+        alert('請先產生訓練計劃');
+        return;
+    }
+
+    // 獲取訓練參數用於列印標題
+    const squat1RM = parseFloat(document.getElementById('squat-1rm').value) || 0;
+    const ohp1RM = parseFloat(document.getElementById('ohp-1rm').value) || 0;
+    const deadlift1RM = parseFloat(document.getElementById('deadlift-1rm').value) || 0;
+    const bench1RM = parseFloat(document.getElementById('bench-1rm').value) || 0;
+    const trainingMaxMultiplier = parseFloat(document.getElementById('training-max').value) || 0.9;
+
+    // 計算 Training Max
+    const trainingMaxes = {
+        squat: Math.round(squat1RM * trainingMaxMultiplier * 10) / 10,
+        ohp: Math.round(ohp1RM * trainingMaxMultiplier * 10) / 10,
+        deadlift: Math.round(deadlift1RM * trainingMaxMultiplier * 10) / 10,
+        bench: Math.round(bench1RM * trainingMaxMultiplier * 10) / 10
+    };
+
+    // 生成列印版本的表格
+    const printTableHTML = generatePrintTable(trainingMaxes);
+
+    // 創建列印視窗
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="zh-TW">
+        <head>
+            <meta charset="UTF-8">
+            <title>531 訓練計劃 - 列印</title>
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                    padding: 20px;
+                    color: #333;
+                }
+                .print-header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    padding-bottom: 15px;
+                    border-bottom: 3px solid #667eea;
+                }
+                .print-header h1 {
+                    font-size: 2em;
+                    color: #667eea;
+                    margin-bottom: 10px;
+                }
+                .print-params {
+                    display: flex;
+                    justify-content: center;
+                    gap: 30px;
+                    margin-top: 15px;
+                    font-size: 0.95em;
+                    color: #666;
+                }
+                .print-params div {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+                .print-params strong {
+                    color: #333;
+                    margin-bottom: 5px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    background: white;
+                    margin-top: 20px;
+                }
+                thead {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                }
+                th {
+                    padding: 15px;
+                    text-align: left;
+                    font-weight: 600;
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                }
+                td {
+                    padding: 15px;
+                    border: 1px solid #ddd;
+                    vertical-align: top;
+                }
+                .week-header {
+                    background: #e9ecef;
+                    font-weight: 600;
+                    text-align: center;
+                    vertical-align: middle;
+                    width: 60px;
+                }
+                .set-info {
+                    margin: 8px 0;
+                    padding: 8px;
+                    background: #f8f9fa;
+                    border-radius: 4px;
+                    border-left: 3px solid #667eea;
+                }
+                .set-header {
+                    font-size: 0.9em;
+                    margin-bottom: 6px;
+                    color: #333;
+                    font-weight: 600;
+                }
+                .barbell-label {
+                    display: inline-block;
+                    padding: 4px 8px;
+                    background: #667eea;
+                    color: white;
+                    border-radius: 4px;
+                    font-size: 0.8em;
+                    font-weight: 500;
+                    margin-bottom: 6px;
+                }
+                .combo-option {
+                    padding: 4px 8px;
+                    margin: 4px 0;
+                    background: white;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    font-size: 0.85em;
+                }
+                .combo-plates {
+                    color: #666;
+                }
+                .combo-total {
+                    color: #28a745;
+                    font-weight: 600;
+                    margin-left: 10px;
+                }
+                .no-combination {
+                    color: #dc3545;
+                    font-size: 0.85em;
+                    padding: 6px;
+                    background: #fff5f5;
+                    border-radius: 4px;
+                    margin-top: 6px;
+                }
+                @media print {
+                    body {
+                        padding: 10px;
+                    }
+                    .print-header {
+                        page-break-after: avoid;
+                    }
+                    table {
+                        page-break-inside: auto;
+                    }
+                    tr {
+                        page-break-inside: avoid;
+                        page-break-after: auto;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="print-header">
+                <h1>531 重量訓練計劃</h1>
+                <p style="color: #666; margin-top: 5px;">基於 Jim Wendler 的 5/3/1 訓練法</p>
+                <div class="print-params">
+                    <div>
+                        <strong>深蹲 1RM:</strong> ${squat1RM} kg (Training Max: ${trainingMaxes.squat} kg)
+                    </div>
+                    <div>
+                        <strong>肩推 1RM:</strong> ${ohp1RM} kg (Training Max: ${trainingMaxes.ohp} kg)
+                    </div>
+                    <div>
+                        <strong>硬舉 1RM:</strong> ${deadlift1RM} kg (Training Max: ${trainingMaxes.deadlift} kg)
+                    </div>
+                    <div>
+                        <strong>臥推 1RM:</strong> ${bench1RM} kg (Training Max: ${trainingMaxes.bench} kg)
+                    </div>
+                </div>
+            </div>
+            ${printTableHTML}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+
+    // 等待內容載入後列印
+    printWindow.onload = function() {
+        setTimeout(() => {
+            printWindow.print();
+        }, 250);
+    };
+}
+
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
     if (!equipment) {
@@ -1239,6 +1580,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const resetEquipmentBtn = document.getElementById('reset-equipment-btn');
     const addPlateTypeBtn = document.getElementById('add-plate-type-btn');
     const saveAllBtn = document.getElementById('save-all-btn');
+    const printBtn = document.getElementById('print-btn');
 
     if (generateBtn) {
         generateBtn.addEventListener('click', generateProgram);
@@ -1256,6 +1598,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (saveAllBtn) {
         saveAllBtn.addEventListener('click', saveAllSettings);
+    }
+    if (printBtn) {
+        printBtn.addEventListener('click', printSchedule);
     }
 });
 
