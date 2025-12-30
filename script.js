@@ -881,30 +881,21 @@ function renderPlates() {
     }
 
     const plateSectionHTML = `
-        <div class="plate-section">
-            <div class="plate-section-header">
-                <h4>全局槓片配置</h4>
-                <div class="plate-header-buttons">
-                    <button class="btn-add-plate" onclick="addPlateType()">新增槓片類型</button>
-                    <button class="btn-reset-plates" onclick="resetPlates()">重置槓片</button>
+        <div class="plate-config">
+            ${Object.keys(equipment.plates).sort((a, b) => parseFloat(b) - parseFloat(a)).map((weight, plateIndex) => `
+                <div class="plate-item">
+                    <input type="number" class="plate-weight-input" id="plate-weight-${plateIndex}"
+                           value="${weight}" step="0.1" min="0" placeholder="重量"
+                           onchange="updatePlateWeight('${weight}', this.value)">
+                    <span>kg ×</span>
+                    <input type="number" class="plate-count-input" id="plate-count-${weight}"
+                           value="${equipment.plates[weight]}" min="0" step="1" placeholder="片數"
+                           onchange="updatePlate('${weight}', this.value)">
+                    <span>片</span>
+                    <button class="btn-remove-plate" onclick="removePlateType('${weight}')" title="移除">×</button>
                 </div>
-            </div>
-            <div class="plate-config">
-                ${Object.keys(equipment.plates).sort((a, b) => parseFloat(b) - parseFloat(a)).map((weight, plateIndex) => `
-                    <div class="plate-item">
-                        <input type="number" class="plate-weight-input" id="plate-weight-${plateIndex}"
-                               value="${weight}" step="0.1" min="0" placeholder="重量"
-                               onchange="updatePlateWeight('${weight}', this.value)">
-                        <span>kg ×</span>
-                        <input type="number" class="plate-count-input" id="plate-count-${weight}"
-                               value="${equipment.plates[weight]}" min="0" step="1" placeholder="片數"
-                               onchange="updatePlate('${weight}', this.value)">
-                        <span>片</span>
-                        <button class="btn-remove-plate" onclick="removePlateType('${weight}')" title="移除">×</button>
-                    </div>
-                `).join('')}
-                ${Object.keys(equipment.plates).length === 0 ? '<div class="no-plates">尚未配置槓片</div>' : ''}
-            </div>
+            `).join('')}
+            ${Object.keys(equipment.plates).length === 0 ? '<div class="no-plates">尚未配置槓片</div>' : ''}
         </div>
     `;
     container.innerHTML = plateSectionHTML;
@@ -1054,13 +1045,15 @@ function removeBarbell(index) {
     }
 }
 
-// 重置設備
-function resetEquipment() {
-    if (confirm('確定要重置為預設設備配置嗎？')) {
-        equipment = JSON.parse(JSON.stringify(DEFAULT_EQUIPMENT));
-        renderEquipment();
-        // 重置後顯示保存通知
-        saveEquipment(true);
+// 重置槓鈴配置
+function resetBarbells() {
+    if (confirm('確定要重置槓鈴配置為預設值嗎？')) {
+        if (!equipment) {
+            equipment = {};
+        }
+        equipment.barbells = JSON.parse(JSON.stringify(DEFAULT_EQUIPMENT.barbells));
+        saveEquipment();
+        renderBarbells();
     }
 }
 
@@ -1577,8 +1570,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const generateBtn = document.getElementById('generate-btn');
     const addBarbellBtn = document.getElementById('add-barbell-btn');
-    const resetEquipmentBtn = document.getElementById('reset-equipment-btn');
+    const resetBarbellsBtn = document.getElementById('reset-barbells-btn');
     const addPlateTypeBtn = document.getElementById('add-plate-type-btn');
+    const resetPlatesBtn = document.getElementById('reset-plates-btn');
     const saveAllBtn = document.getElementById('save-all-btn');
     const printBtn = document.getElementById('print-btn');
 
@@ -1588,13 +1582,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addBarbellBtn) {
         addBarbellBtn.addEventListener('click', addBarbell);
     }
-    if (resetEquipmentBtn) {
-        resetEquipmentBtn.addEventListener('click', resetEquipment);
+    if (resetBarbellsBtn) {
+        resetBarbellsBtn.addEventListener('click', resetBarbells);
     }
     if (addPlateTypeBtn) {
         addPlateTypeBtn.addEventListener('click', function() {
             addPlateType();
         });
+    }
+    if (resetPlatesBtn) {
+        resetPlatesBtn.addEventListener('click', resetPlates);
     }
     if (saveAllBtn) {
         saveAllBtn.addEventListener('click', saveAllSettings);
@@ -1614,6 +1611,23 @@ window.updatePlateWeight = updatePlateWeight;
 window.addPlateType = addPlateType;
 window.removePlateType = removePlateType;
 window.resetPlates = resetPlates;
+// 切換設備配置區塊的展開/摺疊
+function toggleEquipmentSection() {
+    const equipmentGrid = document.getElementById('equipment-grid');
+    const collapseIcon = document.getElementById('equipment-collapse-icon');
+
+    if (equipmentGrid) {
+        if (equipmentGrid.style.display === 'none') {
+            equipmentGrid.style.display = 'grid';
+            collapseIcon.textContent = '▼';
+        } else {
+            equipmentGrid.style.display = 'none';
+            collapseIcon.textContent = '▶';
+        }
+    }
+}
+
 window.removeBarbell = removeBarbell;
 window.selectBarbell = selectBarbell;
 window.selectCombination = selectCombination;
+window.toggleEquipmentSection = toggleEquipmentSection;

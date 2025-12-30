@@ -51,6 +51,26 @@ h2 {
     border-bottom: 2px solid #eee;
 }
 
+.collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.collapsible-header:hover {
+    color: #667eea;
+}
+
+.collapse-icon {
+    font-size: 0.8em;
+    color: #667eea;
+    transition: transform 0.3s;
+    margin-left: 10px;
+}
+
 .input-section {
     background: #f8f9fa;
     padding: 25px;
@@ -179,6 +199,7 @@ select:focus {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 25px;
+    animation: slideDown 0.3s ease-out;
 }
 
 .equipment-subsection {
@@ -204,56 +225,17 @@ select:focus {
     color: #667eea;
 }
 
+.subsection-header-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 .btn-small {
     padding: 6px 12px;
     font-size: 0.85em;
 }
 
-.plate-section {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #e9ecef;
-}
-
-.plate-section:last-child {
-    margin-bottom: 0;
-}
-
-.plate-section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.plate-header-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-reset-plates {
-    background: #ffc107;
-    color: #333;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8em;
-    font-weight: 500;
-}
-
-.btn-reset-plates:hover {
-    background: #e0a800;
-}
-
-.plate-section-header h4 {
-    margin: 0;
-    font-size: 1em;
-    color: #495057;
-    font-weight: 600;
-}
 
 .no-plates {
     text-align: center;

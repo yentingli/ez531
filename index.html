@@ -46,21 +46,26 @@
                 <div class="input-group input-group-button">
                     <button id="generate-btn" class="btn-primary">產生計劃</button>
                 </div>
+                <div class="input-group input-group-button">
+                    <button id="save-all-btn" class="btn-primary">儲存所有設定</button>
+                </div>
             </div>
         </section>
 
         <section class="equipment-section">
-            <h2>設備配置</h2>
-            <div class="equipment-controls">
-                <button id="save-all-btn" class="btn-primary">儲存所有設定</button>
-                <button id="reset-equipment-btn" class="btn-secondary">重置為預設</button>
-            </div>
+            <h2 class="collapsible-header" onclick="toggleEquipmentSection()">
+                <span>設備配置</span>
+                <span class="collapse-icon" id="equipment-collapse-icon">▶</span>
+            </h2>
 
-            <div class="equipment-grid">
+            <div class="equipment-grid" id="equipment-grid" style="display: none;">
                 <div class="equipment-subsection">
                     <div class="subsection-header">
                         <h3>槓鈴配置</h3>
-                        <button id="add-barbell-btn" class="btn-secondary btn-small">新增槓鈴</button>
+                        <div class="subsection-header-buttons">
+                            <button id="add-barbell-btn" class="btn-secondary btn-small">新增槓鈴</button>
+                            <button id="reset-barbells-btn" class="btn-secondary btn-small">重置槓鈴</button>
+                        </div>
                     </div>
                     <div id="barbells-container"></div>
                 </div>
@@ -68,7 +73,10 @@
                 <div class="equipment-subsection">
                     <div class="subsection-header">
                         <h3>槓片配置</h3>
-                        <button id="add-plate-type-btn" class="btn-secondary btn-small">新增槓片類型</button>
+                        <div class="subsection-header-buttons">
+                            <button id="add-plate-type-btn" class="btn-secondary btn-small">新增槓片類型</button>
+                            <button id="reset-plates-btn" class="btn-secondary btn-small">重置槓片</button>
+                        </div>
                     </div>
                     <div id="plates-container"></div>
                 </div>
