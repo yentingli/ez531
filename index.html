@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>531 重量訓練規劃器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>531 重量訓練規劃器</h1>
+            <p class="subtitle">基於 Jim Wendler 的 5/3/1 訓練法</p>
+        </header>
+
+        <section class="input-section">
+            <h2>訓練參數設定</h2>
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="squat-1rm">深蹲 1RM (kg)</label>
+                    <input type="number" id="squat-1rm" step="0.1" min="0" value="100">
+                </div>
+                <div class="input-group">
+                    <label for="ohp-1rm">肩推 1RM (kg)</label>
+                    <input type="number" id="ohp-1rm" step="0.1" min="0" value="60">
+                </div>
+                <div class="input-group">
+                    <label for="deadlift-1rm">硬舉 1RM (kg)</label>
+                    <input type="number" id="deadlift-1rm" step="0.1" min="0" value="150">
+                </div>
+                <div class="input-group">
+                    <label for="bench-1rm">臥推 1RM (kg)</label>
+                    <input type="number" id="bench-1rm" step="0.1" min="0" value="80">
+                </div>
+                <div class="input-group">
+                    <label for="training-max">Training Max</label>
+                    <select id="training-max">
+                        <option value="0.9">90%</option>
+                        <option value="0.95">95%</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="tolerance">容忍度 (kg)</label>
+                    <input type="number" id="tolerance" step="0.1" min="0.1" value="1" placeholder="1">
+                </div>
+                <div class="input-group input-group-button">
+                    <button id="generate-btn" class="btn-primary">產生計劃</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="equipment-section">
+            <h2>設備配置</h2>
+            <div class="equipment-controls">
+                <button id="save-all-btn" class="btn-primary">儲存所有設定</button>
+                <button id="reset-equipment-btn" class="btn-secondary">重置為預設</button>
+            </div>
+
+            <div class="equipment-grid">
+                <div class="equipment-subsection">
+                    <div class="subsection-header">
+                        <h3>槓鈴配置</h3>
+                        <button id="add-barbell-btn" class="btn-secondary btn-small">新增槓鈴</button>
+                    </div>
+                    <div id="barbells-container"></div>
+                </div>
+
+                <div class="equipment-subsection">
+                    <div class="subsection-header">
+                        <h3>槓片配置</h3>
+                        <button id="add-plate-type-btn" class="btn-secondary btn-small">新增槓片類型</button>
+                    </div>
+                    <div id="plates-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="program-section" class="program-section" style="display: none;">
+            <h2>訓練計劃</h2>
+            <div id="program-table"></div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
