@@ -8,7 +8,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    padding: 15px;
+    padding: 20px;
     color: #333;
 }
 
@@ -16,27 +16,28 @@ body {
     max-width: 1800px;
     margin: 0 auto;
     background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    padding: 30px 50px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 40px;
 }
 
 header {
     text-align: center;
     margin-bottom: 40px;
     padding-bottom: 20px;
-    border-bottom: 3px solid #667eea;
+    border-bottom: 1px solid #e5e7eb;
 }
 
 h1 {
-    font-size: 2.5em;
+    font-size: 2.2em;
     color: #667eea;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    font-weight: 600;
 }
 
 .subtitle {
     color: #666;
-    font-size: 1.1em;
+    font-size: 1em;
 }
 
 section {
@@ -44,11 +45,12 @@ section {
 }
 
 h2 {
-    font-size: 1.8em;
+    font-size: 1.5em;
     color: #333;
     margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #eee;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
 }
 
 .collapsible-header {
@@ -58,10 +60,20 @@ h2 {
     cursor: pointer;
     user-select: none;
     transition: color 0.2s;
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
 }
 
 .collapsible-header:hover {
     color: #667eea;
+}
+
+.collapsible-header span:first-child {
+    flex: 1;
 }
 
 .collapse-icon {
@@ -73,8 +85,9 @@ h2 {
 
 .input-section {
     background: #f8f9fa;
-    padding: 25px;
-    border-radius: 15px;
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
 }
 
 .input-row {
@@ -96,7 +109,7 @@ h2 {
 label {
     display: block;
     margin-bottom: 6px;
-    font-weight: 600;
+    font-weight: 500;
     color: #555;
     font-size: 0.9em;
 }
@@ -153,15 +166,9 @@ select:focus {
 
 .equipment-section {
     background: #f8f9fa;
-    padding: 25px;
-    border-radius: 15px;
-}
-
-.equipment-controls {
-    margin-bottom: 15px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
 }
 
 .save-message {
@@ -251,7 +258,7 @@ select:focus {
 
     .container {
         max-width: 100%;
-        padding: 25px 30px;
+        padding: 24px;
     }
 }
 
@@ -337,12 +344,6 @@ select:focus {
     color: #667eea;
 }
 
-.barbell-title {
-    font-weight: 600;
-    font-size: 1.1em;
-    color: #667eea;
-}
-
 .btn-remove {
     background: #dc3545;
     color: white;
@@ -355,28 +356,6 @@ select:focus {
 
 .btn-remove:hover {
     background: #c82333;
-}
-
-.plate-config-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-    margin-bottom: 8px;
-}
-
-.btn-add-plate {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8em;
-}
-
-.btn-add-plate:hover {
-    background: #218838;
 }
 
 .plate-config {
@@ -452,15 +431,31 @@ select:focus {
 
 .program-section {
     margin-top: 40px;
+    padding: 24px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
 }
 
 .program-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 20px;
     flex-wrap: wrap;
     gap: 15px;
+}
+
+.program-header h2 {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 200px;
+}
+
+.program-header-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .btn-print {
@@ -521,11 +516,6 @@ tbody tr:hover {
     font-weight: 600;
     text-align: center;
     vertical-align: middle;
-}
-
-.day-cell {
-    font-weight: 600;
-    color: #667eea;
 }
 
 .set-info {
@@ -637,6 +627,10 @@ tbody tr:hover {
 @media (max-width: 768px) {
     .container {
         padding: 20px;
+    }
+
+    body {
+        padding: 12px;
     }
 
     h1 {
