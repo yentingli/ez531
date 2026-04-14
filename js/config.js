@@ -46,8 +46,8 @@ const WEEK_PROGRAMS = {
         { percentage: 95, reps: '1+' }
     ],
     4: [
-        { percentage: 40, reps: 5, sets: 2 },
-        { percentage: 50, reps: 5, sets: 2 },
-        { percentage: 60, reps: 5, sets: 2 }
+        { percentage: 40, reps: 5 },
+        { percentage: 50, reps: 5 },
+        { percentage: 60, reps: 5 }
     ]
 };
